@@ -1,0 +1,943 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#090711">
+
+<title>Otherworld — A Product by OuterAI</title>
+
+<style>
+:root {
+  --bg: #090711;
+  --panel: #151020;
+  --border: #30213f;
+  --purple: #9b5cff;
+  --text: #f5efff;
+  --muted: #a99bbd;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, sans-serif;
+}
+
+header {
+  padding: 19px 16px;
+  border-bottom: 1px solid var(--border);
+  background: #0e0a18;
+}
+
+.brand {
+  font-size: 23px;
+  font-weight: 900;
+  letter-spacing: 3px;
+}
+
+.brand span {
+  color: var(--purple);
+}
+
+header p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+main {
+  width: min(100%, 900px);
+  margin: auto;
+  padding: 20px 14px 35px;
+}
+
+.hero-tag {
+  color: #bb98ff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+h1 {
+  font-size: clamp(27px, 7vw, 40px);
+  line-height: 1.15;
+  margin: 9px 0;
+}
+
+.intro {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.7;
+  margin-bottom: 21px;
+}
+
+.preview {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #49305f;
+  border-radius: 16px;
+  background: #110c20;
+  box-shadow: 0 0 30px #8d3dff12;
+}
+
+#art {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+}
+
+#generatingOverlay {
+  position: absolute;
+  inset: 0 0 40px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+  background: #100b1def;
+  color: #f5efff;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  z-index: 2;
+}
+
+#generatingOverlay.visible { display: flex; }
+
+.loader {
+  width: 30px;
+  height: 30px;
+  border: 3px solid #ffffff30;
+  border-top-color: #b58aff;
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.art-label {
+  padding: 11px 12px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+.controls {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  margin-top: 16px;
+  padding: 17px;
+}
+
+h2 {
+  font-size: 16px;
+  margin: 0 0 19px;
+}
+
+.field {
+  margin-bottom: 19px;
+}
+
+.field:last-child {
+  margin-bottom: 0;
+}
+
+label {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+output {
+  color: #c6a5ff;
+  font-weight: 700;
+}
+
+select,
+input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  border-radius: 9px;
+  background: #0d0915;
+  border: 1px solid #49365c;
+  color: white;
+  font-size: 14px;
+}
+
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--purple);
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+button {
+  border: 0;
+  padding: 13px 9px;
+  border-radius: 10px;
+  font-weight: 750;
+  font-size: 13px;
+  cursor: pointer;
+  color: white;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.primary {
+  background: linear-gradient(110deg, #7839d9, #a45cff);
+}
+
+.secondary {
+  background: #28183c;
+  border: 1px solid #51356e;
+}
+
+button:active {
+  transform: scale(.98);
+}
+
+.tip {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+  margin-top: 17px;
+}
+
+.credit {
+  margin-top: 22px;
+  padding: 20px 12px;
+  text-align: center;
+  background: linear-gradient(135deg, #171020, #100b1b);
+  border: 1px solid var(--border);
+  border-radius: 13px;
+}
+
+.credit-title {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #c6a5ff;
+  font-weight: 800;
+}
+
+.credit-name {
+  font-size: 21px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  margin-top: 7px;
+}
+
+.credit-sub {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 5px;
+}
+
+footer {
+  text-align: center;
+  color: #8e7d9f;
+  font-size: 10px;
+  line-height: 2;
+  padding: 23px 10px;
+  letter-spacing: 1px;
+}
+
+footer span {
+  color: #b58aff;
+  font-weight: 800;
+}
+
+@media (max-width: 380px) {
+  .buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .brand {
+    font-size: 21px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="brand">✦ OTHER<span>WORLD</span></div>
+  <p>CREATE BEYOND REALITY · BY OUTERAI</p>
+</header>
+
+<main>
+
+  <div class="hero-tag">YOUR PERSONAL WORLD ENGINE</div>
+
+  <h1>Imagine a world.<br>Bring it to life.</h1>
+
+  <div class="intro">
+    Explore floating islands, towering mountains, glowing
+    waterfalls, and mysterious landscapes. Create a new
+    world every time you explore.
+  </div>
+
+  <section class="preview">
+    <canvas id="art" width="900" height="600"></canvas>
+    <div id="generatingOverlay" role="status" aria-live="polite">
+      <div class="loader" aria-hidden="true"></div>
+      <span>GENERATING YOUR WORLD...</span>
+    </div>
+
+    <div class="art-label">
+      <span>OTHERWORLD • WORLD ENGINE 0.1</span>
+      <span id="seedLabel">SEED: 48271</span>
+    </div>
+  </section>
+
+  <section class="controls">
+    <h2>✦ Customize your world</h2>
+
+    <div class="field">
+      <label for="palette">World atmosphere</label>
+      <select id="palette">
+        <option value="cosmic">Cosmic Violet</option>
+        <option value="emerald">Emerald Kingdom</option>
+        <option value="sunset">Golden Sunset</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="timeOfDay">Time of day</label>
+      <select id="timeOfDay">
+        <option value="night" selected>Night</option>
+        <option value="day">Day</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="height">
+        Mountain height
+        <output id="heightOut">65%</output>
+      </label>
+      <input id="height" type="range"
+        min="25" max="100" value="65">
+    </div>
+
+    <div class="field">
+      <label for="water">
+        Waterfalls
+        <output id="waterOut">4</output>
+      </label>
+      <input id="water" type="range"
+        min="1" max="8" value="4">
+    </div>
+
+    <div class="field">
+      <label for="stars">
+        Stars
+        <output id="starsOut">100</output>
+      </label>
+      <input id="stars" type="range"
+        min="20" max="180" value="100">
+    </div>
+
+    <div class="field">
+      <label for="seed">World seed</label>
+      <input id="seed" type="text"
+        inputmode="numeric"
+        maxlength="12"
+        value="48271"
+        placeholder="Enter a number">
+    </div>
+
+    <div class="buttons">
+      <button class="primary" id="generate">
+        ✦ Generate World
+      </button>
+
+      <button class="secondary" id="randomSeed">
+        ⟳ Random Seed
+      </button>
+
+      <button class="secondary" id="save">
+        ↓ Save PNG
+      </button>
+
+      <button class="secondary" id="reset">
+        ↺ Reset Settings
+      </button>
+    </div>
+
+    <p class="tip">
+      Every seed creates a repeatable arrangement of
+      landscape details. Experiment with the controls
+      and save your favorite creations as PNG images.
+      Generation happens locally on your device.
+    </p>
+  </section>
+
+  <section class="credit">
+    <div class="credit-title">AN ORIGINAL CREATIVE PROJECT</div>
+    <div class="credit-name">OUTERAI</div>
+    <div class="credit-sub">
+      Researching. Creating. Exploring what's possible.
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  OTHERWORLD<br>
+  <span>CREATED BY OUTERAI</span><br>
+  A CREATIVE EXPERIMENT IN PROCEDURAL GENERATION
+</footer>
+
+<script>
+(() => {
+  "use strict";
+
+  const canvas = document.getElementById("art");
+  const ctx = canvas.getContext("2d");
+
+  const W = canvas.width;
+  const H = canvas.height;
+
+  const $ = id => document.getElementById(id);
+
+  const palettes = {
+    cosmic: {
+      skyTop: "#080719",
+      skyBottom: "#3a195e",
+      glow: "#b66cff",
+      far: "#382957",
+      mountain: "#25203f",
+      mountainLight: "#9380b9",
+      grass: "#674c98",
+      grassLight: "#b28bdf",
+      rock: "#251b3b",
+      rockLight: "#49345f",
+      water: "#53d9ff",
+      waterGlow: "#a6efff",
+      stars: "#eee4ff",
+      moon: "#e8d9ff"
+    },
+
+    emerald: {
+      skyTop: "#061817",
+      skyBottom: "#205b55",
+      glow: "#6bffcb",
+      far: "#20584c",
+      mountain: "#183c36",
+      mountainLight: "#8ac5a3",
+      grass: "#317e61",
+      grassLight: "#9ce8ad",
+      rock: "#15372f",
+      rockLight: "#28644c",
+      water: "#57ffe2",
+      waterGlow: "#b4fff4",
+      stars: "#e1fff0",
+      moon: "#d2ffe5"
+    },
+
+    sunset: {
+      skyTop: "#21102c",
+      skyBottom: "#d86669",
+      glow: "#ffba72",
+      far: "#82405e",
+      mountain: "#492944",
+      mountainLight: "#e99a90",
+      grass: "#b56861",
+      grassLight: "#ffd19a",
+      rock: "#50283f",
+      rockLight: "#88425a",
+      water: "#7ee7ff",
+      waterGlow: "#e1ffff",
+      stars: "#fff0db",
+      moon: "#fff0c6"
+    }
+  };
+
+  const dayPalettes = {
+    cosmic: {
+      skyTop: "#62b8f5", skyBottom: "#e6c9ff", glow: "#fff0ad",
+      far: "#8c9cc9", mountain: "#596487", mountainLight: "#d9def3",
+      grass: "#62a86b", grassLight: "#b7e99a", rock: "#4a536f",
+      rockLight: "#8998b8", water: "#45c8ed", waterGlow: "#e0ffff",
+      stars: "#ffffff", moon: "#ffe59a"
+    },
+    emerald: {
+      skyTop: "#6ac9f0", skyBottom: "#d7f5d2", glow: "#fff5a8",
+      far: "#77bca0", mountain: "#4d8270", mountainLight: "#d0e8c9",
+      grass: "#3f9a59", grassLight: "#b6ed91", rock: "#3c6959",
+      rockLight: "#78ad84", water: "#36cfc5", waterGlow: "#d9fff5",
+      stars: "#ffffff", moon: "#fff1a6"
+    },
+    sunset: {
+      skyTop: "#83c8f5", skyBottom: "#ffd0a0", glow: "#fff1a1",
+      far: "#cf8b91", mountain: "#87536d", mountainLight: "#f4c0a3",
+      grass: "#bd805c", grassLight: "#ffe0a0", rock: "#674258",
+      rockLight: "#bd7d79", water: "#56d8f3", waterGlow: "#efffff",
+      stars: "#ffffff", moon: "#fff0a8"
+    }
+  };
+
+  let rand = Math.random;
+
+  function setSeed(seed) {
+    let n = Number(seed) >>> 0;
+    if (!n) n = 48271;
+
+    rand = function() {
+      n = (Math.imul(1664525, n) + 1013904223) >>> 0;
+      return n / 4294967296;
+    };
+  }
+
+  function between(a, b) {
+    return a + (b - a) * rand();
+  }
+
+  function polygon(points, fill, stroke = null, width = 1) {
+    ctx.beginPath();
+    ctx.moveTo(points[0][0], points[0][1]);
+
+    for (let i = 1; i < points.length; i++) {
+      ctx.lineTo(points[i][0], points[i][1]);
+    }
+
+    ctx.closePath();
+    ctx.fillStyle = fill;
+    ctx.fill();
+
+    if (stroke) {
+      ctx.strokeStyle = stroke;
+      ctx.lineWidth = width;
+      ctx.stroke();
+    }
+  }
+
+  function line(x1, y1, x2, y2, color, width = 1) {
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.stroke();
+  }
+
+  function ellipse(x, y, rx, ry, color) {
+    ctx.beginPath();
+    ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+  }
+
+  function drawBackground(p) {
+    const sky = ctx.createLinearGradient(0, 0, 0, H);
+    sky.addColorStop(0, p.skyTop);
+    sky.addColorStop(1, p.skyBottom);
+
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, W, H);
+
+    const glow = ctx.createRadialGradient(
+      450, 220, 5, 450, 220, 360
+    );
+
+    glow.addColorStop(0, p.glow + "55");
+    glow.addColorStop(1, p.glow + "00");
+
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, W, H);
+
+    const isDay = $("timeOfDay").value === "day";
+    const mx = 715;
+    const my = 115;
+
+    // Sun in daytime, moon and stars at night.
+    const celestial = ctx.createRadialGradient(
+      mx - 12, my - 12, 2, mx, my, isDay ? 58 : 47
+    );
+    celestial.addColorStop(0, "#ffffff");
+    celestial.addColorStop(1, p.moon);
+    if (isDay) {
+      ctx.save();
+      ctx.shadowColor = p.moon;
+      ctx.shadowBlur = 28;
+      ellipse(mx, my, 37, 37, celestial);
+      ctx.restore();
+    } else {
+      ellipse(mx, my, 34, 34, celestial);
+
+      const count = Number($("stars").value);
+      for (let i = 0; i < count; i++) {
+        const x = rand() * W;
+        const y = rand() * 340;
+        const r = between(.5, 2.1);
+        ellipse(x, y, r, r, p.stars);
+        if (rand() > .92) {
+          line(x - 4, y, x + 4, y, p.stars, .7);
+          line(x, y - 4, x, y + 4, p.stars, .7);
+        }
+      }
+    }
+
+    // Distant floating islands
+    for (let i = 0; i < 6; i++) {
+      const x = between(-20, W + 20);
+      const y = between(245, 365);
+      const s = between(.18, .42);
+
+      ellipse(x, y, 62 * s, 10 * s, p.far);
+
+      polygon([
+        [x - 45*s, y],
+        [x + 45*s, y],
+        [x + 20*s, y + 20*s],
+        [x, y + 48*s],
+        [x - 20*s, y + 20*s]
+      ], p.rock);
+    }
+  }
+
+  function drawMountains(p) {
+    const amount = Number($("height").value) / 100;
+
+    // Distant mountain range
+    const points = [[0, 405]];
+
+    for (let x = 0; x <= W; x += 75) {
+      points.push([
+        x,
+        360 - rand() * 100 * amount
+      ]);
+    }
+
+    points.push([W, 430], [0, 430]);
+    polygon(points, p.far);
+
+    // Main mountain peaks
+    for (let i = 0; i < 7; i++) {
+      const x = 75 + i * 125 + between(-30, 30);
+      const baseY = 430 + between(-12, 15);
+      const peakY = baseY - between(100, 225) * amount;
+      const half = between(65, 115);
+
+      polygon([
+        [x - half, baseY],
+        [x - half*.3, peakY + 50],
+        [x, peakY],
+        [x + half*.2, peakY + 45],
+        [x + half, baseY]
+      ], p.mountain);
+
+      polygon([
+        [x - half, baseY],
+        [x - half*.3, peakY + 50],
+        [x, peakY],
+        [x - 8, peakY + 65],
+        [x - 30, baseY]
+      ], p.mountainLight);
+
+      polygon([
+        [x - 22, peakY + 35],
+        [x, peakY],
+        [x + 20, peakY + 38],
+        [x + 5, peakY + 28],
+        [x - 5, peakY + 33]
+      ], "#e8e4ff");
+    }
+  }
+
+  function drawIsland(p) {
+    const topY = 365;
+
+    ellipse(450, 420, 310, 43, "#08051088");
+
+    // Island surface
+    polygon([
+      [125, topY + 12],
+      [190, topY - 28],
+      [290, topY - 48],
+      [390, topY - 35],
+      [500, topY - 52],
+      [620, topY - 32],
+      [735, topY + 4],
+      [785, topY + 27],
+      [700, topY + 48],
+      [570, topY + 54],
+      [450, topY + 65],
+      [310, topY + 53],
+      [205, topY + 37]
+    ], p.grass, p.grassLight, 3);
+
+    // Rocky underside
+    polygon([
+      [125, topY + 12],
+      [205, topY + 37],
+      [310, topY + 53],
+      [450, topY + 65],
+      [570, topY + 54],
+      [700, topY + 48],
+      [785, topY + 27],
+      [730, topY + 75],
+      [650, topY + 106],
+      [580, topY + 146],
+      [515, topY + 181],
+      [450, topY + 205],
+      [395, topY + 177],
+      [335, topY + 145],
+      [265, topY + 112],
+      [190, topY + 69]
+    ], p.rock);
+
+    polygon([
+      [205, topY + 37],
+      [335, topY + 65],
+      [395, topY + 177],
+      [335, topY + 145],
+      [265, topY + 112],
+      [190, topY + 69]
+    ], p.rockLight);
+
+    polygon([
+      [450, topY + 65],
+      [515, topY + 181],
+      [450, topY + 205],
+      [395, topY + 177]
+    ], p.rockLight);
+
+    polygon([
+      [570, topY + 54],
+      [700, topY + 48],
+      [730, topY + 75],
+      [650, topY + 106],
+      [580, topY + 146],
+      [515, topY + 181]
+    ], "#171226");
+
+    // Glowing crystals
+    for (let i = 0; i < 12; i++) {
+      const x = between(225, 680);
+      const y = between(415, 475);
+      const h = between(7, 22);
+
+      polygon([
+        [x - 5, y],
+        [x, y - h],
+        [x + 5, y]
+      ], i % 2 ? p.glow : p.rockLight);
+    }
+  }
+
+  function drawWaterfalls(p) {
+    const count = Number($("water").value);
+    const positions = [];
+
+    for (let i = 0; i < count; i++) {
+      positions.push(
+        245 + i * (410 / Math.max(1, count - 1))
+      );
+    }
+
+    positions.forEach((x, i) => {
+      const startY = 421 + Math.sin(i * 1.5) * 12;
+      const endY = 558 + rand() * 25;
+      const width = between(8, 17);
+
+      ctx.save();
+      ctx.shadowColor = p.water;
+      ctx.shadowBlur = 18;
+
+      polygon([
+        [x - width, startY],
+        [x + width, startY],
+        [x + width * .6, endY],
+        [x - width * .5, endY - 8]
+      ], p.water + "99");
+
+      ctx.restore();
+
+      polygon([
+        [x - width * .35, startY],
+        [x + width * .35, startY],
+        [x + width * .15, endY],
+        [x - width * .15, endY - 5]
+      ], p.waterGlow);
+
+      for (let j = 0; j < 5; j++) {
+        ellipse(
+          x + between(-28, 28),
+          endY + between(-8, 15),
+          between(1, 4),
+          between(1, 3),
+          p.water + "99"
+        );
+      }
+    });
+  }
+
+  function drawTrees(p) {
+    for (let i = 0; i < 35; i++) {
+      const x = between(220, 690);
+      const y = between(340, 400);
+
+      const nx = (x - 450) / 330;
+      const ny = (y - 365) / 65;
+
+      if (nx * nx + ny * ny > .75) continue;
+
+      const size = between(7, 16);
+
+      line(x, y + 10, x, y + 22, p.rock, 3);
+
+      polygon([
+        [x, y - size],
+        [x - size*.65, y + size*.4],
+        [x + size*.65, y + size*.4]
+      ], p.grassLight);
+
+      polygon([
+        [x, y - size*.6],
+        [x - size*.35, y + size*.3],
+        [x + size*.35, y + size*.3]
+      ], p.grass);
+    }
+  }
+
+  function drawClouds(p) {
+    for (let i = 0; i < 5; i++) {
+      const x = between(20, 850);
+      const y = between(205, 320);
+      const size = between(18, 38);
+
+      ellipse(x, y, size, size*.25, p.moon + "22");
+      ellipse(x + size*.5, y - 5, size*.6, size*.3, p.moon + "22");
+      ellipse(x - size*.5, y - 3, size*.5, size*.22, p.moon + "22");
+    }
+  }
+
+  function draw() {
+    const enteredSeed = $("seed").value.trim();
+
+    const seed = /^\d+$/.test(enteredSeed)
+      ? Number(enteredSeed) >>> 0
+      : 48271;
+
+    setSeed(seed);
+
+    const paletteName = $("palette").value;
+    const isDay = $("timeOfDay").value === "day";
+    const p = isDay
+      ? (dayPalettes[paletteName] || dayPalettes.cosmic)
+      : (palettes[paletteName] || palettes.cosmic);
+
+    ctx.clearRect(0, 0, W, H);
+
+    drawBackground(p);
+    drawClouds(p);
+    drawMountains(p);
+    drawIsland(p);
+    drawTrees(p);
+    drawWaterfalls(p);
+
+    ctx.strokeStyle = "#ffffff20";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(1, 1, W - 2, H - 2);
+
+    $("seedLabel").textContent = "SEED: " + seed;
+  }
+
+  function generateWithStatus() {
+    const overlay = $("generatingOverlay");
+    overlay.classList.add("visible");
+    $("generate").disabled = true;
+    $("generate").textContent = "Generating…";
+
+    // Yield to the browser so the loading message paints before drawing.
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        try {
+          draw();
+        } finally {
+          overlay.classList.remove("visible");
+          $("generate").disabled = false;
+          $("generate").textContent = "✦ Generate World";
+        }
+      }, 60);
+    });
+  }
+
+  function updateLabels() {
+    $("heightOut").textContent = $("height").value + "%";
+    $("waterOut").textContent = $("water").value;
+    $("starsOut").textContent = $("stars").value;
+  }
+
+  $("generate").addEventListener("click", generateWithStatus);
+
+  $("randomSeed").addEventListener("click", () => {
+    $("seed").value =
+      Math.floor(Math.random() * 999999999) + 1;
+
+    generateWithStatus();
+  });
+
+  ["palette", "timeOfDay", "height", "water", "stars"].forEach(id => {
+    $(id).addEventListener("input", () => {
+      updateLabels();
+      draw();
+    });
+  });
+
+  $("seed").addEventListener("change", draw);
+
+  $("reset").addEventListener("click", () => {
+    $("palette").value = "cosmic";
+    $("timeOfDay").value = "night";
+    $("height").value = 65;
+    $("water").value = 4;
+    $("stars").value = 100;
+    $("seed").value = "48271";
+
+    updateLabels();
+    draw();
+  });
+
+  $("save").addEventListener("click", () => {
+    try {
+      const link = document.createElement("a");
+
+      link.download = "Otherworld-World-" +
+        $("seedLabel").textContent.split(": ")[1] +
+        ".png";
+
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    } catch (error) {
+      alert("Could not save the image in this browser. Try opening the website in Chrome.");
+    }
+  });
+
+  updateLabels();
+  draw();
+})();
+</script>
+
+</body>
+</html>
